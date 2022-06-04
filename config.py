@@ -14,12 +14,13 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://' + USERNAME + ':' + PASSWORD + '@' + HOST + '/' + DATABASE
 
     # # configuration Google Cloud SQL (change this accordingly)
+    # # 34.101.90.51 user root password 123456
     # PASSWORD ="123456"
-    # PUBLIC_IP_ADDRESS ="public ip of database"
+    # PUBLIC_IP_ADDRESS ="34.101.90.51"
     # DBNAME ="capfits"
-    # PROJECT_ID ="gcp project id"
-    # INSTANCE_NAME ="capfits-c22-ps041:asia-southeast2:db-capfits"
-    # # GCP
+    # PROJECT_ID ="caps-test-352212"
+    # INSTANCE_NAME = "caps"
+    # # GCP Service Account : p645067272339-6gz9vq@gcp-sa-cloud-sql.iam.gserviceaccount.com
     # SECRET_KEY = "yoursecretkey"
     # SQLALCHEMY_DATABASE_URI = f"mysql + mysqldb://root:{PASSWORD}@{PUBLIC_IP_ADDRESS}/{DBNAME}?unix_socket =/cloudsql/{PROJECT_ID}:{INSTANCE_NAME}"
     

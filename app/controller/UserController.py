@@ -2,6 +2,7 @@ from app.model.user import User
 from app.model import role
 from app import response,app,db
 from flask import request
+import json
 
 def index():
     try:
@@ -13,11 +14,13 @@ def index():
         return response.badRequest(e)
 
 def login():
+    data = json.loads(request.data)
     try:
-        username = request.json['username']
-        password = request.json['password']
-        print(username,password)
-        user = User.query.filter_by(username=username,password=password).first()
+        email = data['email']
+        password = data['password']
+        print(email,password)
+        user = User.query.filter_by(email=email,password=password).first()
+        print(user)
         if user is None:
             return response.badRequest("Username or Password is wrong")
         return response.success(singleObject(user),"success")
