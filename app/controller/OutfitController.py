@@ -1,5 +1,8 @@
 from pyexpat import model
 from app.model.outfit import Outfit
+from app.model.user import User
+from app.model.foto_outfit import FotoOutfit
+from app.model.review import Review
 from MLmodel.recommender import Recommender
 from app import response,app,db
 from flask import request
@@ -60,12 +63,20 @@ def recommend():
     try:
         data = json.loads(request.data)
         img = decodeBitmap(data)
+        id_rec, index_sim = Recommender.recommend(img)
+        print(index_sim)
         recommended=[]
+        # wanted to queried
+
         # SELECT outfit.`id_outfit`,foto_outfit.`foto`,nama_outfit,harga_sewa,lokasi,rating FROM outfit
         # JOIN USER ON user.`id_user` = outfit.`id_user`
         # JOIN foto_outfit ON foto_outfit.`id_outfit` = outfit.`id_outfit`
         # LEFT JOIN review ON review.`id_outfit` = outfit.`id_outfit`
         # WHERE outfit.`id_outfit` = 1636
+
+        for id in id_rec:
+            recommended.append(Outfit.join(User, User.id_user == Outfit.id_user).join(FotoOutfit, FotoOutfit.id_outfit == Outfit.id_outfit).join(Review, Review.id_outfit == Outfit.id_outfit,isouter = True).filter(Outfit.id_outfit == id).all())
+        
         return response.success(formatArray(recommended),"success")
     except Exception as e:
         return response.badRequest(e)

@@ -35,4 +35,4 @@ def getOutfit():
 
 @app.route('/recommend', methods=['POST'])
 def recommend():
-    return ['1','2','3','4','5','6']
+    return OutfitController.recommend()
