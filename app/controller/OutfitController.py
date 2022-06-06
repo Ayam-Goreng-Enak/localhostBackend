@@ -1,6 +1,9 @@
+from pyexpat import model
 from app.model.outfit import Outfit
+# from 
 from app import response,app,db
 from flask import request
+import json
 
 def index():
     try:
@@ -47,6 +50,23 @@ def addOutfit():
         db.session.add(outfit)
         db.session.commit()
         return response.success(singleObject(outfit),"success")
+    except Exception as e:
+        return response.badRequest(e)
+
+def decodeBitmap(data):
+    return data
+
+def recommend():
+    try:
+        data = json.loads(request.data)
+        img = decodeBitmap(data)
+        recommended=[]
+        # SELECT outfit.`id_outfit`,foto_outfit.`foto`,nama_outfit,harga_sewa,lokasi,rating FROM outfit
+        # JOIN USER ON user.`id_user` = outfit.`id_user`
+        # JOIN foto_outfit ON foto_outfit.`id_outfit` = outfit.`id_outfit`
+        # LEFT JOIN review ON review.`id_outfit` = outfit.`id_outfit`
+        # WHERE outfit.`id_outfit` = 1636
+        return response.success(formatArray(recommended),"success")
     except Exception as e:
         return response.badRequest(e)
 
