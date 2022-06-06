@@ -32,3 +32,7 @@ def addOutfit():
 @app.route('/getOutfit', methods=['POST'])
 def getOutfit():
     return UserController.getOutfit()
+
+@app.route('/recommend', methods=['POST'])
+def recommend():
+    return ['1','2','3','4','5','6']
