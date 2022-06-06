@@ -63,8 +63,8 @@ def rec():
     try:
         data = json.loads(request.data)
         img = decodeBitmap(data)
+        print(img)
         id_rec, index_sim = recommend(img)
-        print(index_sim)
         recommended=[]
         # wanted to queried
 
