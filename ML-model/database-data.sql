@@ -14,11 +14,6 @@ MySQL - 10.4.11-MariaDB-log : Database - db_capfits
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 USE `db_capfits`;
 
-/*Data for the table `alembic_version` */
-
-insert  into `alembic_version`(`version_num`) values 
-('f6b50103bca0');
-
 /*Data for the table `article_type` */
 
 insert  into `article_type`(`id_tipe`,`id_sub_category`,`nama_tipe`) values 
