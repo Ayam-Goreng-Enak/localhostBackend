@@ -1,6 +1,6 @@
 from pyexpat import model
 from app.model.outfit import Outfit
-# from 
+from MLmodel.recommender import Recommender
 from app import response,app,db
 from flask import request
 import json
