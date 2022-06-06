@@ -3,7 +3,7 @@ from app.model.outfit import Outfit
 from app.model.user import User
 from app.model.foto_outfit import FotoOutfit
 from app.model.review import Review
-from MLmodel.recommender import Recommender
+from MLmodel.recommender import recommend
 from app import response,app,db
 from flask import request
 import json
@@ -59,11 +59,11 @@ def addOutfit():
 def decodeBitmap(data):
     return data
 
-def recommend():
+def rec():
     try:
         data = json.loads(request.data)
         img = decodeBitmap(data)
-        id_rec, index_sim = Recommender.recommend(img)
+        id_rec, index_sim = recommend(img)
         print(index_sim)
         recommended=[]
         # wanted to queried

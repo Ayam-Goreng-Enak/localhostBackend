@@ -1,8 +1,6 @@
 import tensorflow as tf
 import csv
-import re
 import numpy as np
-import cv2
 import os
 from sklearn.metrics.pairwise import pairwise_distances
 import pandas as pd
@@ -12,7 +10,7 @@ HEIGHT = 224
 WIDTH = 224
 CHANNELS = 3
 
-model = tf.keras.models.load_model(os.getcwd()+'\ML-model\FinalFashion.h5')
+model = tf.keras.models.load_model(os.getcwd()+'\MLmodel\FinalFashion.h5')
 model.compile(optimizer = tf.keras.optimizers.Adam(), 
                 loss = 'categorical_crossentropy', 
                 metrics = ['accuracy'])
@@ -28,7 +26,7 @@ def prepareImg(filename):
 
 def readEmbedding():
     isifile = []
-    with open(os.getcwd()+"\ML-model\shirt_embedding.csv", 'r', encoding='UTF8') as csv_file:
+    with open(os.getcwd()+"\MLmodel\shirt_embedding.csv", 'r', encoding='UTF8') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         next(csv_reader)
         line_count = 0
@@ -65,4 +63,4 @@ def recommend(img, top_n = 6):
     idx_rec, idx_sim = get_recommender(img, top_n = top_n)
     print("Recommendation Similarity: ",idx_sim)
     return idx_rec, idx_sim
-recommend(os.getcwd()+'\ML-model\img1.jpg')
+# recommend(os.getcwd()+'\MLmodel\img1.jpg')
