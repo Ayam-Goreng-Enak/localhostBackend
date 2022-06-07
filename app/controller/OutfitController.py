@@ -93,16 +93,16 @@ def rec():
                     recommended.append(row)
         print(recommended)
 
-        # Fetch the service account key JSON file contents
-        cred = credentials.Certificate("credentials.json")
+        # # Fetch the service account key JSON file contents
+        # cred = credentials.Certificate(os.getcwd()+'\Bangkit-capfits-firebase-adminsdk-ir8od-6b9ecbadba.json')
 
-        # Initialize the app with a service account, granting admin privileges
-        app = firebase_admin.initialize_app(cred, {
-            'storageBucket': '<BUCKET_NAME>.appspot.com',
-        }, name='storage')
+        # # Initialize the app with a service account, granting admin privileges
+        # app = firebase_admin.initialize_app(cred, {
+        #     'storageBucket': '<BUCKET_NAME>.appspot.com',
+        # }, name='storage')
 
-        bucket = storage.bucket(app=app)
-        blob = bucket.blob("<your_blob_path>")
+        # bucket = storage.bucket(app=app)
+        # blob = bucket.blob("<your_blob_path>")
 
         print(blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET'))
         # for id in id_rec:
