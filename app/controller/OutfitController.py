@@ -4,9 +4,15 @@ from app.model.user import User
 from app.model.foto_outfit import FotoOutfit
 from app.model.review import Review
 from MLmodel.recommender import recommend
+import base64
+import PIL.Image as Image
+import io
+import os
 from app import response,app,db
 from flask import request
 import json
+from sqlalchemy import text
+from sqlalchemy import create_engine
 
 def index():
     try:
@@ -56,15 +62,18 @@ def addOutfit():
     except Exception as e:
         return response.badRequest(e)
 
-def decodeBitmap(data):
-    return data
+def decodeB64(data):
+    image_64_decode = base64.b64decode(data) # base64.decode(image_64_encode)
+    return image_64_decode
 
 def rec():
     try:
         data = json.loads(request.data)
-        img = decodeBitmap(data)
-        print(img)
-        id_rec, index_sim = recommend(img)
+        bytearrimg = decodeB64(data)
+        byteimg = bytearray(bytearrimg)
+        img = Image.open(io.BytesIO(byteimg))
+        img.save(os.getcwd()+'\MLmodel\img1.jpg')
+        id_rec, index_sim = recommend(os.getcwd()+'\MLmodel\img1.jpg')
         recommended=[]
         # wanted to queried
 
@@ -73,13 +82,40 @@ def rec():
         # JOIN foto_outfit ON foto_outfit.`id_outfit` = outfit.`id_outfit`
         # LEFT JOIN review ON review.`id_outfit` = outfit.`id_outfit`
         # WHERE outfit.`id_outfit` = 1636
-
-        for id in id_rec:
-            recommended.append(Outfit.join(User, User.id_user == Outfit.id_user).join(FotoOutfit, FotoOutfit.id_outfit == Outfit.id_outfit).join(Review, Review.id_outfit == Outfit.id_outfit,isouter = True).filter(Outfit.id_outfit == id).all())
+        SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://' + str(os.environ.get('DB_USERNAME')) + ':' + str(os.environ.get('DB_PASS')) + '@' + str(os.environ.get('DB_HOST')) + '/' + str(os.environ.get('DB_DATABASE'))
+        engine = create_engine(SQLALCHEMY_DATABASE_URI)
         
-        return response.success(formatArray(recommended),"success")
+        with engine.connect() as connection:
+            for id in id_rec:
+                result = connection.execute(text("SELECT outfit.`id_outfit`,foto_outfit.`foto`,nama_outfit,harga_sewa,lokasi,rating FROM outfit JOIN USER ON user.`id_user` = outfit.`id_user` JOIN foto_outfit ON foto_outfit.`id_outfit` = outfit.`id_outfit` LEFT JOIN review ON review.`id_outfit` = outfit.`id_outfit` WHERE outfit.`id_outfit` = {}".format(id)))
+                for row in result:
+                    recommended.append(row)
+        print(recommended)
+        # for id in id_rec:
+        #     recommended.append(Outfit.query.all().join(User, User.id_user == Outfit.id_user).join(FotoOutfit, FotoOutfit.id_outfit == Outfit.id_outfit).join(Review, Review.id_outfit == Outfit.id_outfit,isouter = True).filter(Outfit.id_outfit == id).all())
+        # query = session.query(User, Document, DocumentsPermissions).join(Document).join(DocumentsPermissions)
+        return response.success(formatArrayRec(recommended),"success")
     except Exception as e:
         return response.badRequest(e)
+
+def formatArrayRec(data):
+    arr = []
+
+    for d in data:
+        arr.append(singleObjectRec(d))
+
+    return arr
+
+def singleObjectRec(data):
+    data = {
+        'id_outfit': data.id_outfit,
+        'foto': data.foto,
+        'nama_outfit': data.nama_outfit,
+        'harga_sewa': data.harga_sewa,
+        'lokasi': data.lokasi,
+        'rating': data.rating
+    }
+    return data
 
 def formatArray(data):
     arr = []
