@@ -93,18 +93,6 @@ def rec():
                     recommended.append(row)
         print(recommended)
 
-        # # Fetch the service account key JSON file contents
-        # cred = credentials.Certificate(os.getcwd()+'\Bangkit-capfits-firebase-adminsdk-ir8od-6b9ecbadba.json')
-
-        # # Initialize the app with a service account, granting admin privileges
-        # app = firebase_admin.initialize_app(cred, {
-        #     'storageBucket': '<BUCKET_NAME>.appspot.com',
-        # }, name='storage')
-
-        # bucket = storage.bucket(app=app)
-        # blob = bucket.blob("<your_blob_path>")
-
-        print(blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET'))
         # for id in id_rec:
         #     recommended.append(Outfit.query.all().join(User, User.id_user == Outfit.id_user).join(FotoOutfit, FotoOutfit.id_outfit == Outfit.id_outfit).join(Review, Review.id_outfit == Outfit.id_outfit,isouter = True).filter(Outfit.id_outfit == id).all())
         # query = session.query(User, Document, DocumentsPermissions).join(Document).join(DocumentsPermissions)
