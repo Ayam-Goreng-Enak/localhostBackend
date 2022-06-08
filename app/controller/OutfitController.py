@@ -115,7 +115,7 @@ def singleObjectRec(data):
         'nama_outfit': data.nama_outfit,
         'harga_sewa': data.harga_sewa,
         'lokasi': data.lokasi,
-        'rating': data.rating
+        'rating': data.rating if data.rating is not None else 0
     }
     return data
 
