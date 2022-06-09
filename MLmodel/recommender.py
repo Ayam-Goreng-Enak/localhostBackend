@@ -2,6 +2,8 @@ import tensorflow as tf
 import csv
 import numpy as np
 import os
+import io
+import PIL.Image as Image
 from sklearn.metrics.pairwise import pairwise_distances
 import pandas as pd
 
@@ -16,10 +18,9 @@ model.compile(optimizer = tf.keras.optimizers.Adam(),
                 metrics = ['accuracy'])
 
 
-def prepareImg(filename):
-    image_string = tf.io.read_file(filename)
-    image_decoded = tf.image.decode_jpeg(image_string, channels=CHANNELS)
-    image_resized = tf.image.resize(image_decoded, [HEIGHT, WIDTH])
+def prepareImg(img):
+    img_tensor = tf.keras.preprocessing.image.img_to_array(img)
+    image_resized = tf.image.resize(img_tensor, [HEIGHT, WIDTH])
     image_normalized = image_resized / 255.0
     image_for_model = np.expand_dims(image_normalized, axis=0)
     return image_for_model
@@ -60,6 +61,7 @@ def get_recommender(img, top_n = 6):
     return id_rec, index_sim
 
 def recommend(img, top_n = 6):
+    img = Image.open(io.BytesIO(img))
     idx_rec, idx_sim = get_recommender(img, top_n = top_n)
     print("Recommendation Similarity: ",idx_sim)
     return idx_rec, idx_sim

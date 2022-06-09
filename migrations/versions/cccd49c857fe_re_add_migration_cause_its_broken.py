@@ -1,8 +1,8 @@
-"""fix db
+"""re add migration cause its broken
 
-Revision ID: c50ab9518b5c
+Revision ID: cccd49c857fe
 Revises: 
-Create Date: 2022-06-05 22:33:43.590698
+Create Date: 2022-06-09 08:12:17.268467
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c50ab9518b5c'
+revision = 'cccd49c857fe'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -112,18 +112,18 @@ def upgrade():
     op.create_table('outfit',
     sa.Column('id_outfit', sa.BIGINT(), autoincrement=True, nullable=False),
     sa.Column('id_user', sa.BIGINT(), nullable=False),
-    sa.Column('id_kategori', sa.BIGINT(), nullable=False),
+    sa.Column('id_kategori', sa.BIGINT(), nullable=True),
     sa.Column('id_gender', sa.BIGINT(), nullable=True),
     sa.Column('id_tahun', sa.BIGINT(), nullable=True),
     sa.Column('id_musim', sa.BIGINT(), nullable=True),
     sa.Column('id_tipe', sa.BIGINT(), nullable=True),
+    sa.Column('id_style', sa.BIGINT(), nullable=True),
     sa.Column('warna', sa.String(length=150), nullable=False),
     sa.Column('nama_outfit', sa.String(length=100), nullable=False),
-    sa.Column('harga_sewa', sa.Integer(), nullable=False),
-    sa.Column('harga_beli', sa.Integer(), nullable=False),
+    sa.Column('harga_sewa', sa.Integer(), nullable=True),
+    sa.Column('harga_beli', sa.Integer(), nullable=True),
     sa.Column('deskripsi', sa.String(length=500), nullable=False),
-    sa.Column('detail_produk', sa.String(length=300), nullable=False),
-    sa.Column('id_style', sa.BIGINT(), nullable=False),
+    sa.Column('detail_produk', sa.String(length=300), nullable=True),
     sa.Column('stock', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['id_gender'], ['gender_baju.id_gender'], ),
     sa.ForeignKeyConstraint(['id_kategori'], ['kategori.id_kategori'], ),
@@ -137,7 +137,7 @@ def upgrade():
     op.create_table('foto_outfit',
     sa.Column('id_foto', sa.BIGINT(), autoincrement=True, nullable=False),
     sa.Column('id_outfit', sa.BIGINT(), nullable=False),
-    sa.Column('foto', sa.String(length=200), nullable=False),
+    sa.Column('foto', sa.TEXT(), nullable=False),
     sa.ForeignKeyConstraint(['id_outfit'], ['outfit.id_outfit'], ),
     sa.PrimaryKeyConstraint('id_foto')
     )

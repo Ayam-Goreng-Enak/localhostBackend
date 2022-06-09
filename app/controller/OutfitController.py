@@ -2,8 +2,6 @@ from pyexpat import model
 from app.model.outfit import Outfit
 from MLmodel.recommender import recommend
 import base64
-import PIL.Image as Image
-import io
 import os
 from app import response,app,db
 from flask import request
@@ -72,9 +70,7 @@ def rec():
         data = json.loads(request.data)
         bytearrimg = decodeB64(data)
         byteimg = bytearray(bytearrimg)
-        img = Image.open(io.BytesIO(byteimg))
-        img.save(os.getcwd()+'\MLmodel\img1.jpg')
-        id_rec, index_sim = recommend(os.getcwd()+'\MLmodel\img1.jpg')
+        id_rec, index_sim = recommend(byteimg)
         recommended=[]
         # wanted to queried
 
