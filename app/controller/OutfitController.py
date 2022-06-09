@@ -95,7 +95,7 @@ def rec():
         
         with engine.connect() as connection:
             for id in id_rec:
-                result = connection.execute(text("SELECT outfit.`id_outfit`,foto_outfit.`foto`,nama_outfit,harga_sewa,lokasi,rating FROM outfit JOIN USER ON user.`id_user` = outfit.`id_user` JOIN foto_outfit ON foto_outfit.`id_outfit` = outfit.`id_outfit` LEFT JOIN review ON review.`id_outfit` = outfit.`id_outfit` WHERE outfit.`id_outfit` = {}".format(id)))
+                result = connection.execute(text(" SELECT outfit.`id_outfit`,foto_outfit.`foto`,warna,nama_outfit,deskripsi,detail_produk,size,nama,waist,hip,size.`length`,harga_sewa,lokasi,rating FROM outfit JOIN foto_outfit ON foto_outfit.`id_outfit` = outfit.`id_outfit` LEFT JOIN size ON size.`id_outfit` = outfit.`id_outfit` JOIN USER ON outfit.`id_user` = user.`id_user` LEFT JOIN review ON review.`id_outfit` = outfit.`id_outfit` WHERE outfit.`id_outfit` = {} GROUP BY outfit.`id_outfit`".format(id)))
                 for row in result:
                     recommended.append(row)
         print(recommended)
