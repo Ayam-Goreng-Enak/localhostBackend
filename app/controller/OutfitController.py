@@ -24,8 +24,9 @@ def index():
 
 
 def getOutfit():
+    data = json.loads(request.data)
     try:
-        id_outfit = request.json['id_outfit']
+        id_outfit = data['id_outfit']
         outfit = Outfit.query.filter_by(id_outfit=id_outfit).first()
         if outfit is None:
             return response.badRequest("Outfit not found")
