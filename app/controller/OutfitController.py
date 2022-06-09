@@ -27,10 +27,20 @@ def getOutfit():
     data = json.loads(request.data)
     try:
         id_outfit = data['id_outfit']
-        outfit = Outfit.query.filter_by(id_outfit=id_outfit).first()
+
+        SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://' + str(os.environ.get('DB_USERNAME')) + ':' + str(os.environ.get('DB_PASS')) + '@' + str(os.environ.get('DB_HOST')) + '/' + str(os.environ.get('DB_DATABASE'))
+        engine = create_engine(SQLALCHEMY_DATABASE_URI)
+        
+        outfit = []
+        with engine.connect() as connection:
+            result = connection.execute(text(" SELECT outfit.`id_outfit`,foto_outfit.`foto`,warna,nama_outfit,deskripsi,detail_produk,size,nama,waist,hip,size.`length`,harga_sewa,lokasi,rating FROM outfit JOIN foto_outfit ON foto_outfit.`id_outfit` = outfit.`id_outfit` LEFT JOIN size ON size.`id_outfit` = outfit.`id_outfit` JOIN USER ON outfit.`id_user` = user.`id_user` LEFT JOIN review ON review.`id_outfit` = outfit.`id_outfit` WHERE outfit.`id_outfit` = {}".format(id_outfit)))
+            for row in result:
+                outfit.append(row)
+
+        # outfit = Outfit.query.filter_by(id_outfit=id_outfit).first()
         if outfit is None:
             return response.badRequest("Outfit not found")
-        return response.success(singleObject(outfit),"success")
+        return response.success(formatArrayDet(outfit),"success")
     except Exception as e:
         return response.badRequest(e)
 
@@ -93,9 +103,36 @@ def rec():
         # for id in id_rec:
         #     recommended.append(Outfit.query.all().join(User, User.id_user == Outfit.id_user).join(FotoOutfit, FotoOutfit.id_outfit == Outfit.id_outfit).join(Review, Review.id_outfit == Outfit.id_outfit,isouter = True).filter(Outfit.id_outfit == id).all())
         # query = session.query(User, Document, DocumentsPermissions).join(Document).join(DocumentsPermissions)
-        return response.success(formatArrayRec(recommended),"success")
+        return response.success(formatArrayDet(recommended),"success")
     except Exception as e:
         return response.badRequest(e)
+
+def formatArrayDet(data):
+    arr = []
+
+    for d in data:
+        arr.append(singleObjectDet(d))
+
+    return arr
+
+def singleObjectDet(data):
+    data = {
+        'id_outfit': data.id_outfit,
+        'foto': data.foto,
+        'warna': data.warna,
+        'nama_outfit': data.nama_outfit,
+        'deskripsi': data.deskripsi,
+        'detail_produk': data.detail_produk,
+        'size': data.size,
+        'nama': data.nama,
+        'waist': data.waist,
+        'hip': data.hip,
+        'length': data.length,
+        'harga_sewa': data.harga_sewa,
+        'lokasi': data.lokasi,
+        'rating': data.rating if data.rating is not None else 0
+    }
+    return data
 
 def formatArrayRec(data):
     arr = []
