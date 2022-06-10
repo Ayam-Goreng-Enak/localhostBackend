@@ -1,6 +1,6 @@
 from pyexpat import model
 from app.model.outfit import Outfit
-# from MLmodel.recommender import recommend
+from MLmodel.recommender import recommend
 import base64
 import os
 from app import response,app,db
@@ -23,8 +23,7 @@ def index():
 def getOutfit():
     data = json.loads(request.data)
     try:
-        id_outfit = data['id_outfit']
-
+        id_outfit = data
         SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://' + str(os.environ.get('DB_USERNAME')) + ':' + str(os.environ.get('DB_PASS')) + '@' + str(os.environ.get('DB_HOST')) + '/' + str(os.environ.get('DB_DATABASE'))
         engine = create_engine(SQLALCHEMY_DATABASE_URI)
         
@@ -37,6 +36,7 @@ def getOutfit():
         # outfit = Outfit.query.filter_by(id_outfit=id_outfit).first()
         if outfit is None:
             return response.badRequest("Outfit not found")
+        print(outfit)
         return response.success(formatArrayDet(outfit),"success")
     except Exception as e:
         return response.badRequest(e)
