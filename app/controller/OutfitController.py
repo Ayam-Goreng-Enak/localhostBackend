@@ -8,11 +8,18 @@ from flask import request
 import json
 import datetime
 from sqlalchemy import text
-from sqlalchemy import create_engine
+import sqlalchemy
+from google.cloud.sql.connector import connector
+from google.cloud.sql.connector import connector
 
 def index():
     try:
-        outfits = Outfit.query.all()
+        outfits = []
+        pool = CloudSQL()
+        with pool.connect() as connection:
+            result = connection.execute("Select * from outfit")              
+            for row in result:
+                outfits.append(row)
         
         return response.success(formatArray(outfits),"success")
     except Exception as e:
@@ -24,16 +31,20 @@ def getOutfit():
     data = json.loads(request.data)
     try:
         id_outfit = data
-        SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://' + str(os.environ.get('DB_USERNAME')) + ':' + str(os.environ.get('DB_PASS')) + '@' + str(os.environ.get('DB_HOST')) + '/' + str(os.environ.get('DB_DATABASE'))
-        engine = create_engine(SQLALCHEMY_DATABASE_URI)
         
+        pool = CloudSQL()
         outfit = []
-        with engine.connect() as connection:
-            result = connection.execute(text(" SELECT outfit.`id_outfit`,foto_outfit.`foto`,warna,nama_outfit,deskripsi,detail_produk,size,nama,waist,hip,size.`length`,harga_sewa,lokasi,rating FROM outfit JOIN foto_outfit ON foto_outfit.`id_outfit` = outfit.`id_outfit` LEFT JOIN size ON size.`id_outfit` = outfit.`id_outfit` JOIN USER ON outfit.`id_user` = user.`id_user` LEFT JOIN review ON review.`id_outfit` = outfit.`id_outfit` WHERE outfit.`id_outfit` = {}".format(id_outfit)))
+        with pool.connect() as connection:
+            result = connection.execute(text(" SELECT outfit.`id_outfit`,foto_outfit.`foto`,warna,nama_outfit,deskripsi,detail_produk,size,nama,waist,hip,size.`length`,harga_sewa,lokasi,rating FROM outfit JOIN foto_outfit ON foto_outfit.`id_outfit` = outfit.`id_outfit` LEFT JOIN size ON size.`id_outfit` = outfit.`id_outfit` JOIN users ON outfit.`id_user` = users.`id_user` LEFT JOIN review ON review.`id_outfit` = outfit.`id_outfit` WHERE outfit.`id_outfit` = {}".format(id_outfit)))
             for row in result:
                 outfit.append(row)
+        
+        # outfit = []
+        # with engine.connect() as connection:
+        #     result = connection.execute(text(" SELECT outfit.`id_outfit`,foto_outfit.`foto`,warna,nama_outfit,deskripsi,detail_produk,size,nama,waist,hip,size.`length`,harga_sewa,lokasi,rating FROM outfit JOIN foto_outfit ON foto_outfit.`id_outfit` = outfit.`id_outfit` LEFT JOIN size ON size.`id_outfit` = outfit.`id_outfit` JOIN users ON outfit.`id_user` = users.`id_user` LEFT JOIN review ON review.`id_outfit` = outfit.`id_outfit` WHERE outfit.`id_outfit` = {}".format(id_outfit)))
+        #     for row in result:
+        #         outfit.append(row)
 
-        # outfit = Outfit.query.filter_by(id_outfit=id_outfit).first()
         if outfit is None:
             return response.badRequest("Outfit not found")
         print(outfit)
@@ -83,19 +94,24 @@ def rec():
         # wanted to queried
 
         # SELECT outfit.`id_outfit`,foto_outfit.`foto`,nama_outfit,harga_sewa,lokasi,rating FROM outfit
-        # JOIN USER ON user.`id_user` = outfit.`id_user`
+        # JOIN user ON user.`id_user` = outfit.`id_user`
         # JOIN foto_outfit ON foto_outfit.`id_outfit` = outfit.`id_outfit`
         # LEFT JOIN review ON review.`id_outfit` = outfit.`id_outfit`
         # WHERE outfit.`id_outfit` = 1636
-        SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://' + str(os.environ.get('DB_USERNAME')) + ':' + str(os.environ.get('DB_PASS')) + '@' + str(os.environ.get('DB_HOST')) + '/' + str(os.environ.get('DB_DATABASE'))
-        engine = create_engine(SQLALCHEMY_DATABASE_URI)
         
-        with engine.connect() as connection:
+        pool = CloudSQL()
+        with pool.connect() as connection:
             for id in id_rec:
-                result = connection.execute(text(" SELECT outfit.`id_outfit`,foto_outfit.`foto`,warna,nama_outfit,deskripsi,detail_produk,size,nama,waist,hip,size.`length`,harga_sewa,lokasi,rating FROM outfit JOIN foto_outfit ON foto_outfit.`id_outfit` = outfit.`id_outfit` LEFT JOIN size ON size.`id_outfit` = outfit.`id_outfit` JOIN USER ON outfit.`id_user` = user.`id_user` LEFT JOIN review ON review.`id_outfit` = outfit.`id_outfit` WHERE outfit.`id_outfit` = {} GROUP BY outfit.`id_outfit`".format(id)))
+                result = connection.execute(text("SELECT outfit.`id_outfit`,foto_outfit.`foto`,warna,nama_outfit,deskripsi,detail_produk,nama,harga_sewa,lokasi,rating FROM outfit JOIN foto_outfit ON foto_outfit.`id_outfit` = outfit.`id_outfit`JOIN users ON outfit.`id_user` = users.`id_user` LEFT JOIN review ON review.`id_outfit` = outfit.`id_outfit` WHERE outfit.`id_outfit` = {}".format(id)))
                 for row in result:
                     recommended.append(row)
-        print(recommended)
+        
+        # with engine.connect() as connection:
+        #     for id in id_rec:
+        #         result = connection.execute(text(" SELECT outfit.`id_outfit`,foto_outfit.`foto`,warna,nama_outfit,deskripsi,detail_produk,nama,harga_sewa,lokasi,rating FROM outfit JOIN foto_outfit ON foto_outfit.`id_outfit` = outfit.`id_outfit`JOIN users ON outfit.`id_user` = users.`id_user` LEFT JOIN review ON review.`id_outfit` = outfit.`id_outfit` WHERE outfit.`id_outfit` = {}".format(id)))
+        #         for row in result:
+        #             recommended.append(row)
+        # print(recommended)
 
         # for id in id_rec:
         #     recommended.append(Outfit.query.all().join(User, User.id_user == Outfit.id_user).join(FotoOutfit, FotoOutfit.id_outfit == Outfit.id_outfit).join(Review, Review.id_outfit == Outfit.id_outfit,isouter = True).filter(Outfit.id_outfit == id).all())
@@ -164,20 +180,32 @@ def singleObject(outfitData):
         'id_user': outfitData.id_user,
         'id_kategori': outfitData.id_kategori,
         'id_gender': outfitData.id_gender,
-        'id_jenis': outfitData.id_jenis,
         'id_tahun': outfitData.id_tahun,
         'id_musim': outfitData.id_musim,
         'id_tipe': outfitData.id_tipe,
+        'id_style': outfitData.id_style,
         'warna': outfitData.warna,
         'nama_outfit': outfitData.nama_outfit,
         'harga_sewa': outfitData.harga_sewa,
         'harga_beli': outfitData.harga_beli,
-        'ukuran': outfitData.ukuran,
         'deskripsi': outfitData.deskripsi,
         'detail_produk': outfitData.detail_produk,
-        'id_style': outfitData.id_style,
-        'is_keranjang': outfitData.is_keranjang,
-        'is_wishlish': outfitData.is_wishlish,
         'stock': outfitData.stock
     }
     return outfitData
+
+def CloudSQL() -> sqlalchemy.engine.Engine:
+    def getconn() -> connector.connect:
+        conn = connector.connect(
+            "caps-test-352212:asia-southeast1:capfitsdb", 
+            "pymysql",
+            user="root",
+            password="123456",
+            db="capfits_db")
+        return conn
+
+    engine = sqlalchemy.create_engine(
+        "mysql+pymysql://",
+        creator=getconn,
+    )
+    return engine

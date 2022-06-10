@@ -1,20 +1,18 @@
 import os
-
-from flask_sqlalchemy import SQLAlchemy
-
+from google.cloud.sql.connector import connector
+import sqlalchemy
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
-    HOST = str(os.environ.get('DB_HOST'))
-    DATABASE = str(os.environ.get('DB_DATABASE'))
-    USERNAME = str(os.environ.get('DB_USERNAME'))
-    PASSWORD = str(os.environ.get('DB_PASS'))
+    # HOST = str(os.environ.get('DB_HOST'))
+    # DATABASE = str(os.environ.get('DB_DATABASE'))
+    # USERNAME = str(os.environ.get('DB_USERNAME'))
+    # PASSWORD = str(os.environ.get('DB_PASS'))
 
-    # localhost
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://' + USERNAME + ':' + PASSWORD + '@' + HOST + '/' + DATABASE
+    # # localhost
+    # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://' + USERNAME + ':' + PASSWORD + '@' + HOST + '/' + DATABASE
 
     # configuration Google Cloud SQL (change this accordingly)
-    # 34.101.90.51 user root password 123456
     # PASSWORD ="123456"
     # HOST ="34.142.214.10"
     # USERNAME = str(os.environ.get('DB_USERNAME'))

@@ -2,7 +2,7 @@ from app import db
 from datetime import datetime
 from sqlalchemy.orm import backref
 
-class User(db.Model):
+class Users(db.Model):
     id_user = db.Column(db.BIGINT, primary_key=True, autoincrement=True)
     id_role = db.Column(db.BIGINT, db.ForeignKey("role.id_role"), nullable=False)
     nama = db.Column(db.String(100), nullable=False)
