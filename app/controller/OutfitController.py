@@ -1,15 +1,12 @@
 from pyexpat import model
 from app.model.outfit import Outfit
-from MLmodel.recommender import recommend
+# from MLmodel.recommender import recommend
 import base64
 import os
 from app import response,app,db
 from flask import request
 import json
 import datetime
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import storage
 from sqlalchemy import text
 from sqlalchemy import create_engine
 
@@ -103,7 +100,7 @@ def rec():
         # for id in id_rec:
         #     recommended.append(Outfit.query.all().join(User, User.id_user == Outfit.id_user).join(FotoOutfit, FotoOutfit.id_outfit == Outfit.id_outfit).join(Review, Review.id_outfit == Outfit.id_outfit,isouter = True).filter(Outfit.id_outfit == id).all())
         # query = session.query(User, Document, DocumentsPermissions).join(Document).join(DocumentsPermissions)
-        return response.success(formatArrayDet(recommended),"success")
+        return response.success(formatArrayRec(recommended),"success")
     except Exception as e:
         return response.badRequest(e)
 
